@@ -18,14 +18,22 @@ class MyTodoApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // リスト一覧画面を表示
-      home: const TodoListPage(),
+      home: TodoListPage(),
     );
   }
 }
 
 // リスト一覧画面用Widget
-class TodoListPage extends StatelessWidget {
-  const TodoListPage({super.key});
+
+class TodoListPage extends StatefulWidget {
+  @override
+  _TodoListPage createState() {
+    return _TodoListPage();
+  }
+}
+
+class _TodoListPage extends State<TodoListPage> {
+  List<String> todoList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -33,39 +41,32 @@ class TodoListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('リスト一覧'),
       ),
-      body: ListView(
-        children: const [
-          Card(
+      body: ListView.builder(
+        itemCount: todoList.length,
+        itemBuilder: (context, index) {
+          return Card(
             child: ListTile(
-              title: Text('ニンジンを買う'),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: Text('タマネギを買う'),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: Text('ジャガイモを買う'),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: Text('カレールーを買う'),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // "push"で新規画面に遷移
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const TodoAddPage(),
+              title: Text(todoList[index]),
             ),
           );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // "push"で新規画面に遷移
+          final String? newListText = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return TodoAddPage();
+              },
+            ),
+          );
+          if (newListText != null) {
+            setState(() {
+              todoList.add(newListText);
+            });
+          }
         },
         child: const Icon(Icons.add),
       ),
@@ -73,8 +74,13 @@ class TodoListPage extends StatelessWidget {
   }
 }
 
-class TodoAddPage extends StatelessWidget {
-  const TodoAddPage({super.key});
+class TodoAddPage extends StatefulWidget {
+  @override
+  _TodoAddPageState createState() => _TodoAddPageState();
+}
+
+class _TodoAddPageState extends State<TodoAddPage> {
+  String _text = '';
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +90,13 @@ class TodoAddPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              onChanged: (String value) {
+                setState(() {
+                  _text = value;
+                });
+              },
+              decoration: const InputDecoration(
                 labelText: '追加したいタスクを入力',
                 border: OutlineInputBorder(),
               ),
@@ -96,7 +107,9 @@ class TodoAddPage extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pop(_text);
+                },
                 child: const Text(
                   '追加',
                   style: TextStyle(color: Colors.blue),
