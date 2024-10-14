@@ -45,10 +45,26 @@ class _TodoListPage extends State<TodoListPage> {
         itemCount: todoList.length,
         onReorder: _onReorder,
         itemBuilder: (context, index) {
-          return Card(
+          return Dismissible(
             key: ValueKey(todoList[index]),
-            child: ListTile(
-              title: Text(todoList[index]),
+            direction: DismissDirection.startToEnd,
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerLeft,
+              child: const Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+            ),
+            onDismissed: (direction) {
+              setState(() {
+                todoList.removeAt(index);
+              });
+            },
+            child: Card(
+              child: ListTile(
+                title: Text(todoList[index]),
+              ),
             ),
           );
         },
