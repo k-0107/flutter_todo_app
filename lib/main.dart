@@ -63,6 +63,23 @@ class _TodoListPage extends State<TodoListPage> {
             },
             child: Card(
               child: ListTile(
+                onTap: () async {
+                  final String? editedText = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return TodoAddPage(
+                          initialText: todoList[index],
+                        );
+                      },
+                    ),
+                  );
+                  if (editedText != null) {
+                    setState(() {
+                      todoList[index] = editedText;
+                    });
+                  }
+                },
                 title: Text(todoList[index]),
               ),
             ),
@@ -104,22 +121,34 @@ class _TodoListPage extends State<TodoListPage> {
 }
 
 class TodoAddPage extends StatefulWidget {
+  final String? initialText;
+
+  TodoAddPage({this.initialText});
   @override
   _TodoAddPageState createState() => _TodoAddPageState();
 }
 
 class _TodoAddPageState extends State<TodoAddPage> {
-  String _text = '';
+  late String _text = '';
+  @override
+  void initState() {
+    super.initState();
+    _text = widget.initialText ?? ''; // 初期テキストを設定（新規追加の場合は空）
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.initialText == null ? 'タスクを追加' : 'タスクを編集'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
+              controller: TextEditingController(text: _text),
               onChanged: (String value) {
                 setState(() {
                   _text = value;
