@@ -41,10 +41,12 @@ class _TodoListPage extends State<TodoListPage> {
       appBar: AppBar(
         title: const Text('リスト一覧'),
       ),
-      body: ListView.builder(
+      body: ReorderableListView.builder(
         itemCount: todoList.length,
+        onReorder: _onReorder,
         itemBuilder: (context, index) {
           return Card(
+            key: ValueKey(todoList[index]),
             child: ListTile(
               title: Text(todoList[index]),
             ),
@@ -71,6 +73,17 @@ class _TodoListPage extends State<TodoListPage> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  //タップ長押しで上下に移動できる
+  void _onReorder(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final item = todoList.removeAt(oldIndex);
+      todoList.insert(newIndex, item);
+    });
   }
 }
 
